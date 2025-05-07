@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations for {{ book['title'] }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    
+    <div class="container py-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">🏠 Home</a>
+
+        <h2>🔍 Recommendations based on: <em>{{ book['title'] }}</em></h2>
+        <p class="mb-4 text-muted">By {{ book['author'] }} | Genre: {{ book['genre'] }} | Status: {{ book['status'] }}</p>
+
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mb-4">⬅ Back to Library</a>
+
+        {% if recommendations %}
+            <div class="list-group">
+                {% for rec in recommendations %}
+                    <a href="{{ url_for('edit_form', book_id=rec['id']) }}" class="list-group-item list-group-item-action">
+                        <strong>{{ rec['title'] }}</strong> — {{ rec['author'] }}<br>
+                        <small>Genre: {{ rec['genre'] }} | Status: {{ rec['status'] }}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No similar books found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

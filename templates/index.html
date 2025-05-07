@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <h1 class="mb-4">📚 Book Tracker</h1>
+
+        {% set total_count = status_counts | sum(attribute='count') %}
+<div class="row mb-4 align-items-end">
+    <div class="col-12 mb-2">
+        <h5 class="text-muted">Library Overview <small class="ms-2">(Total: {{ total_count }} books)</small></h5>
+    </div>
+    {% for item in status_counts %}
+    <div class="col-auto">
+        <div class="card shadow-sm p-3 text-center border-0 bg-light rounded-3" style="min-width: 120px;">
+            <div class="fw-bold">{{ item['status'] }}</div>
+            <div>{{ item['count'] }} book{{ '' if item['count'] == 1 else 's' }}</div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="col-auto d-flex align-items-center">
+        <a href="/export" class="btn btn-outline-primary">⬇ Export CSV</a>
+    </div>
+</div>
+
+          
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'warning' if category == 'warning' else 'success' }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">🏠 Home</a>
+
+
+        <form method="POST" action="/" class="mb-3">
+
+            <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Search by title, author, genre, or status" value="{{ query }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <form method="POST" action="/add" class="card p-3 mb-4">
+            <h5>Add New Book</h5>
+            <div class="row g-2 mb-2">
+                <div class="col-md"><input name="title" required placeholder="Title" class="form-control"></div>
+                <div class="col-md"><input name="author" placeholder="Author" class="form-control"></div>
+            </div>
+            <div class="row g-2 mb-2">
+                <div class="col-md"><input type="date" name="release_date" class="form-control"></div>
+                <div class="col-md"><input name="genre" placeholder="Genre" class="form-control"></div>
+                <div class="col-md">
+                    <select name="status" class="form-select">
+                        <option>Owned</option>
+                        <option>Wishlist</option>
+                        <option>Currently Reading</option>
+                        <option>Completed</option>
+                    </select>
+                </div>
+            </div>
+            <textarea name="notes" placeholder="Notes (optional)" class="form-control mb-2"></textarea>
+            <button class="btn btn-success" type="submit">Add Book</button>
+        </form>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <a href="/?sort=title&order={{ 'desc' if sort == 'title' and order == 'asc' else 'asc' }}" class="text-decoration-none text-dark">
+                            Title {% if sort == 'title' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="/?sort=author&order={{ 'desc' if sort == 'author' and order == 'asc' else 'asc' }}" class="text-decoration-none text-dark">
+                            Author {% if sort == 'author' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="/?sort=release_date&order={{ 'desc' if sort == 'release_date' and order == 'asc' else 'asc' }}" class="text-decoration-none text-dark">
+                            Release Date {% if sort == 'release_date' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="/?sort=genre&order={{ 'desc' if sort == 'genre' and order == 'asc' else 'asc' }}" class="text-decoration-none text-dark">
+                            Genre {% if sort == 'genre' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="/?sort=status&order={{ 'desc' if sort == 'status' and order == 'asc' else 'asc' }}" class="text-decoration-none text-dark">
+                            Status {% if sort == 'status' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book['title'] }}</td>
+                    <td>{{ book['author'] }}</td>
+                    <td>{{ book['release_date'] }}</td>
+                    <td>{{ book['genre'] }}</td>
+                    <td>{{ book['status'] }}</td>
+                    <td>{{ book['notes'] }}</td>
+                    <td class="d-flex gap-2">
+                        <a href="/edit/{{ book['id'] }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="/delete/{{ book['id'] }}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="/recommend/{{ book['id'] }}" class="btn btn-info btn-sm">Recommend</a>
+
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center">No books found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
