@@ -8,7 +8,7 @@ A simple Book Tracker built with Flask and SQLite.
 - View books in a searchable and sortable table
 - Update or delete book entries
 - Smart duplicate prevention (by title + author)
-- Get recommendations based on genre/author/status
+- Get recommendations based on genre/author/status using TF-IDF Vectorizer and Cosine similarity
 - Dashboard summary with reading status counts
 - Export your book collection to CSV
 - Clean, responsive UI using Bootstrap 5
