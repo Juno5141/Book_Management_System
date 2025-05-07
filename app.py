@@ -9,13 +9,12 @@ from io import StringIO
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Needed for flashing messages
 
-# SQLite config
+
 def get_db_connection():
     conn = sqlite3.connect('books.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# Initialize database
 if not os.path.exists('books.db'):
     conn = get_db_connection()
     conn.execute('''
@@ -32,7 +31,6 @@ if not os.path.exists('books.db'):
     conn.commit()
     conn.close()
 
-# Home page - view & search books with sorting
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -58,7 +56,6 @@ def index():
     else:
         books = conn.execute(f'SELECT * FROM books ORDER BY {sort} {order}').fetchall()
 
-    # Status counts
     status_counts = conn.execute('''
         SELECT status, COUNT(*) as count FROM books GROUP BY status
     ''').fetchall()
@@ -66,7 +63,6 @@ def index():
     conn.close()
     return render_template('index.html', books=books, query=query, sort=sort, order=order, status_counts=status_counts)
 
-# Export books as CSV
 @app.route('/export')
 def export_books():
     conn = get_db_connection()
@@ -80,10 +76,9 @@ def export_books():
         writer.writerow([book['id'], book['title'], book['author'], book['release_date'], book['genre'], book['status'], book['notes']])
 
     response = Response(output.getvalue(), mimetype='text/csv')
-    response.headers['Content-Disposition'] = 'attachment; filename=books.csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=bookList.csv'
     return response
 
-# Add book
 @app.route('/add', methods=['POST'])
 def add_book():
     title = request.form['title'].strip()
@@ -107,7 +102,7 @@ def add_book():
     conn.close()
     return redirect(url_for('index'))
 
-# Edit book form
+
 @app.route('/edit/<int:book_id>')
 def edit_form(book_id):
     conn = get_db_connection()
@@ -115,7 +110,7 @@ def edit_form(book_id):
     conn.close()
     return render_template('edit.html', book=book)
 
-# Update book
+
 @app.route('/update/<int:book_id>', methods=['POST'])
 def update_book(book_id):
     title = request.form['title']
@@ -133,7 +128,7 @@ def update_book(book_id):
     conn.close()
     return redirect(url_for('index'))
 
-# Recommend similar books
+
 @app.route('/recommend/<int:book_id>')
 def recommend(book_id):
     conn = get_db_connection()
@@ -163,7 +158,7 @@ def recommend(book_id):
 
     return render_template('recommend.html', book=selected_book, recommendations=recommended_books)
 
-# Delete book
+
 @app.route('/delete/<int:book_id>')
 def delete_book(book_id):
     conn = get_db_connection()
