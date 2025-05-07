@@ -3,13 +3,10 @@ import requests
 from random import choice
 from time import sleep
 
-# Genres (OpenLibrary subject names)
 subjects = [
     "science_fiction", "romance", "thriller", "history", "biography", "fantasy",
     "mystery", "psychology", "philosophy", "self_help", "drama", "adventure"
 ]
-
-# Connect to SQLite DB
 conn = sqlite3.connect('books.db')
 cursor = conn.cursor()
 
@@ -40,7 +37,7 @@ for subject in subjects:
                 break
         if inserted >= 50:
             break
-        sleep(0.5)  # Be gentle with the API
+        sleep(0.5) 
     except Exception as e:
         print(f"Error fetching from {subject}: {e}")
 
